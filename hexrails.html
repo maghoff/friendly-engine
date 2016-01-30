@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>hexrails</title>
+<style>
+
+.center {
+  fill: #fee;
+}
+
+.outside {
+  fill: #eef;
+  stroke: #88f;
+}
+
+.outside:hover {
+  fill: #ccf;
+}
+
+.rails {
+  fill: none;
+  stroke-width: 2px;
+  stroke: #333;
+}
+
+.toggleable {
+  stroke: none;
+}
+.toggleable.selected {
+  stroke: #333;
+}
+
+.core {
+  display: none;
+}
+.core.show {
+  display: block;
+}
+
+</style>
+</head>
+<body>
+
+<svg viewBox="-51 -52 102 104" width="102" height="104">
+
+<defs>
+  <path id="hex" d="m-20 0 l10 17 l20 0 l10 -17 l-10 -17 l-20 0 l-10 17" />
+  <path id="straight" d="M-10,17 l0,-34 M10,17 l0,-34"/>
+  <path id="bend" d="M-10,17 a20,20 0 0 0 -10,-17 M10,17 a40,40 0 0 0 -20,-34"/>
+</defs>
+
+<use class="center" xlink:href="#hex" />
+
+<use transform="translate(  0, 34)" data-dir="0" class="outside" xlink:href="#hex" />
+<use transform="translate(-30, 17)" data-dir="1" class="outside" xlink:href="#hex" />
+<use transform="translate(-30,-17)" data-dir="2" class="outside" xlink:href="#hex" />
+<use transform="translate(  0,-34)" data-dir="3" class="outside" xlink:href="#hex" />
+<use transform="translate( 30,-17)" data-dir="4" class="outside" xlink:href="#hex" />
+<use transform="translate( 30, 17)" data-dir="5" class="outside" xlink:href="#hex" />
+
+<use transform="rotate(  0)" data-type="straight-0" class="core rails" xlink:href="#straight" />
+<use transform="rotate( 60)" data-type="straight-1" class="core rails" xlink:href="#straight" />
+<use transform="rotate(120)" data-type="straight-2" class="core rails" xlink:href="#straight" />
+
+<use transform="rotate(  0)" data-type="bend-0" class="core rails" xlink:href="#bend" />
+<use transform="rotate( 60)" data-type="bend-1" class="core rails" xlink:href="#bend" />
+<use transform="rotate(120)" data-type="bend-2" class="core rails" xlink:href="#bend" />
+<use transform="rotate(180)" data-type="bend-3" class="core rails" xlink:href="#bend" />
+<use transform="rotate(240)" data-type="bend-4" class="core rails" xlink:href="#bend" />
+<use transform="rotate(300)" data-type="bend-5" class="core rails" xlink:href="#bend" />
+
+<use transform="translate(  0, 34) rotate(   0)" data-dir="0" class="toggleable rails" xlink:href="#straight"/>
+<use transform="translate(-30, 17) rotate(  60)" data-dir="1" class="toggleable rails" xlink:href="#straight"/>
+<use transform="translate(-30,-17) rotate( 120)" data-dir="2" class="toggleable rails" xlink:href="#straight"/>
+<use transform="translate(  0,-34) rotate( 180)" data-dir="3" class="toggleable rails" xlink:href="#straight"/>
+<use transform="translate( 30,-17) rotate( 240)" data-dir="4" class="toggleable rails" xlink:href="#straight"/>
+<use transform="translate( 30, 17) rotate( 300)" data-dir="5" class="toggleable rails" xlink:href="#straight"/>
+
+</svg>
+
+<script>
+function updateCore() {
+  var enableDir = [];
+  Array.prototype.slice.call(document.querySelectorAll(".toggleable")).forEach(function (el) {
+    enableDir[parseInt(el.getAttribute("data-dir"), 10)] = el.classList.contains("selected");
+  });
+
+  for (var i = 0; i < 3; ++i) {
+    var el = document.querySelector("[data-type='straight-" + i + "']");
+    el.classList.remove("show");
+    if (enableDir[i] && enableDir[i + 3]) el.classList.add("show");
+  }
+
+  for (var i = 0; i < 6; ++i) {
+    var el = document.querySelector("[data-type='bend-" + i + "']");
+    el.classList.remove("show");
+    if (enableDir[i] && enableDir[(i + 2) % 6]) el.classList.add("show");
+  }
+}
+
+document.addEventListener("click", function (ev) {
+  var dir = ev.target.getAttribute("data-dir");
+  if (dir != null) {
+    document.querySelector(".toggleable[data-dir='" + dir + "']").classList.toggle("selected");
+
+    updateCore();
+
+    ev.preventDefault();
+  }
+});
+</script>
+
+</body>
+</html>
